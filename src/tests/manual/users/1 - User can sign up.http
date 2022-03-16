@@ -1,0 +1,12 @@
+POST http://localhost:3000/api/users/signup
+Content-Type: application/json
+
+{
+  "email": "tonisanchez.dev@gmail.com",
+  "password": "Password123",
+  "language": "es-ES"
+}
+
+// Expect a 201 with an object detailing: message_code, message_text and crud.
+// Crud field contains details about what's been modified.
+// A confirmation email should be received on the email above.

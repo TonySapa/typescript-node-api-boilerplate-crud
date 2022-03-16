@@ -1,0 +1,15 @@
+POST http://localhost:3000/api/users/signup
+Content-Type: application/json
+
+{
+  "email": "tonysapa90@outlook.com",
+  "password": "Password123"
+  // "language": "es-ES"
+}
+
+// Should fail for not specifying language.
+// Expect a 422 with the following payload:
+//  {
+//    "message_code": 4223,
+//    "message_text": "Language should be specified with its own field"
+//  }

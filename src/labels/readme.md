@@ -1,0 +1,2 @@
+# What's on "labels" folder
+Only text constants. Strings literals that are refactorised for fast changes from other departments, like marketing department. Also useful in case of using manual and accurate translated versions of text contents in the application.

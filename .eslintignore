@@ -1,0 +1,7 @@
+build
+.eslintrc
+node_modules
+_mock_
+_dev_notes
+_requests_demos
+_mailjet_demo

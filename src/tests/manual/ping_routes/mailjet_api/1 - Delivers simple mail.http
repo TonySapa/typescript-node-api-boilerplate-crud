@@ -1,0 +1,3 @@
+GET http://localhost:3000/api/emails/ping-mailjet/tonisanchez.dev@gmail.com
+
+// Expect 200 with string "Hello World" and delivery of email to the email above
