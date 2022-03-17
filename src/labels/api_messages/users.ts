@@ -5,3 +5,4 @@ export const PASSWORD_SHORT = 'Password should contain at least 8 characters';
 export const LANGUAGE_UNSPECIFIED = 'Language should be specified with its own field';
 export const INVALID_CONFIRMATION_LINK = 'Confirmation link is invalid or already has been confirmed';
 export const LOGGIN_FAILED = 'Password is incorrect or user doesn\'t exist';
+export const INVALID_TOKEN = 'Token is invalid or has expired';

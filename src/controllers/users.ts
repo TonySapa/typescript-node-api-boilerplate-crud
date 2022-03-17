@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import User from '../models/User';
+import User from '../models/user/User';
 import { UserToSignup } from '../types';
 import { userRegistered, passwordTooShort, languageUnspecified, invalidConfirmationLink, loginFailed } from '../views/json/users';
 import { validatePassword } from './users_handlers';

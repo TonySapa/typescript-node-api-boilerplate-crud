@@ -1,8 +1,9 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
-import { typesOfAccountStatus } from '../domain';
+import { typesOfAccountStatus } from '../../domain';
 
 export interface UserType {
+  _id?: Types.ObjectId;
   email?: string,
   passwordHash?: string,
   account_status?: string,
@@ -37,7 +38,7 @@ const userSchema = new Schema<UserType>({
 userSchema.set('toJSON', {
   transform: (_document, returnedObject) => {
     returnedObject.id = `${returnedObject._id}`.toString();
-    delete returnedObject._id;
+    // delete returnedObject._id;
     delete returnedObject.__v;
     delete returnedObject.passwordHash;
   }

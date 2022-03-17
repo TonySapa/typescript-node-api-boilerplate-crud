@@ -1,0 +1,10 @@
+POST http://localhost:3000/api/entries/
+Content-Type: application/json
+
+{
+  "field1": "Hello World",
+  "field2": 47
+}
+
+// Before testing use log in endpoint to get a new token.
+// Expect a 201 with the content of the new entry including the field "user" with the user id.

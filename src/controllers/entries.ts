@@ -1,13 +1,15 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../models/User';
-import EntryModel, { entryType } from '../models/Entry';
+import User from '../models/user/User';
+import EntryModel from '../models/entry/Entry';
+import { entryType } from '../models/entry/entry.types';
+import { tokenFailed } from '../views/json/users';
 
 const router = express.Router();
 
 declare module 'jsonwebtoken' {
   interface UserIDJwtPayload extends jwt.JwtPayload {
-    userId: string
+    email: string
   }
 }
 
@@ -99,17 +101,22 @@ router.put('/:id', async (req, res) => {
  * @param {entryType} entry 
  * @returns a 201 with the new entry
  *****************************************************************************/
-router.post('/', async (req, res) => {
+router.post('/', async (req, res, next) => {
+  // 1 - Get token and user data
   const decodedToken = <jwt.UserIDJwtPayload><unknown>
-    jwt.verify(req.token, `${process.env.SECRET}`);
-  console.log(req);
-  const userId = decodedToken.id; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+    jwt.verify(req.token, `${process.env.SECRET}`, (error) => next(error));
+  
+  // 2 - Find if user exists and get id
+  const user = await User.findOne({ email: decodedToken.email });
+  console.log(decodedToken.email);
+  const userId = user && user._id?.toString(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
 
-  const entry = new EntryModel({ ...req.body, user: userId }); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-
-  if (!req.token || !userId) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+  // Reject requests where token or user are invalid
+  if (!req.token || !user) {
+    return res.status(401).json(tokenFailed);
+  // Accept valid requests
   } else {
+    const entry = new EntryModel(req.body); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
     entry.user = `${userId}`;
     const savedEntry = await entry.save();
     return res.status(201).json(savedEntry);

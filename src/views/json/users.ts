@@ -6,7 +6,8 @@ import {
   PASSWORD_SHORT,
   LANGUAGE_UNSPECIFIED,
   INVALID_CONFIRMATION_LINK,
-  LOGGIN_FAILED
+  LOGGIN_FAILED,
+  INVALID_TOKEN
 } from '../../labels/api_messages/users';
 
 /** When request is fullfilled and user saved to database */
@@ -49,4 +50,13 @@ export const invalidConfirmationLink: ApiResponse = {
 export const loginFailed: ApiResponse = {
   message_code: 4011,
   message_text: LOGGIN_FAILED
+};
+
+/******************************************************************************
+ * API Response when request fails because of token
+ * @returns 4012: "Token is invalid or has expired"
+ *****************************************************************************/
+ export const tokenFailed: ApiResponse = {
+  message_code: 4012,
+  message_text: INVALID_TOKEN
 };
