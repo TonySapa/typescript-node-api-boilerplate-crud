@@ -15,7 +15,6 @@ const entrySchema = new Schema<entryType>({
   },
   user: { // The id of the user that created the entry
     type: String,
-    unique: true,
     required: true
   }
 });

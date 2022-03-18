@@ -36,6 +36,7 @@ export interface ApiResponseCrud {
   message_code: number,
   message_text: string,
   dev_tip?: string,
+  verboose?: unknown,
   crud: ApiResponseCrudResult
 }
 

@@ -6,3 +6,6 @@ export const LANGUAGE_UNSPECIFIED = 'Language should be specified with its own f
 export const INVALID_CONFIRMATION_LINK = 'Confirmation link is invalid or already has been confirmed';
 export const LOGGIN_FAILED = 'Password is incorrect or user doesn\'t exist';
 export const INVALID_TOKEN = 'Token is invalid or has expired';
+export const WRONG_DOCUMENT_ID = 'Mongoose document id requested is malformatted and a document couldn\'t be found';
+export const DUPLICATED_VALUE = 'The document contains duplicated values that should be unique';
+export const UNKNOWN_ERROR = 'An unknown error has ocurred';

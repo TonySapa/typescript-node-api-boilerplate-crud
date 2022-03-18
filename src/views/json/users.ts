@@ -7,7 +7,10 @@ import {
   LANGUAGE_UNSPECIFIED,
   INVALID_CONFIRMATION_LINK,
   LOGGIN_FAILED,
-  INVALID_TOKEN
+  INVALID_TOKEN,
+  WRONG_DOCUMENT_ID,
+  DUPLICATED_VALUE,
+  UNKNOWN_ERROR
 } from '../../labels/api_messages/users';
 
 /** When request is fullfilled and user saved to database */
@@ -53,10 +56,37 @@ export const loginFailed: ApiResponse = {
 };
 
 /******************************************************************************
+ * Mongoose id of document is malformatted or doesn't exist
+ * @returns 4224: "Mongoose document is malformatted and a document couldnt..."
+ *****************************************************************************/
+ export const wrongDocumentId: ApiResponse = {
+  message_code: 4224,
+  message_text: WRONG_DOCUMENT_ID
+};
+
+/******************************************************************************
  * API Response when request fails because of token
  * @returns 4012: "Token is invalid or has expired"
  *****************************************************************************/
  export const tokenFailed: ApiResponse = {
   message_code: 4012,
   message_text: INVALID_TOKEN
+};
+
+/******************************************************************************
+ * Mongoose id of document is malformatted or doesn't exist
+ * @returns 4092: "A value should be unique but is duplicated."
+ *****************************************************************************/
+ export const duplicatedValue = (message: string): ApiResponse => ({
+  message_code: 4092,
+  message_text: message || DUPLICATED_VALUE
+});
+
+/******************************************************************************
+ * Unknown errors
+ * @returns 400: "An unknown error has ocurred"
+ *****************************************************************************/
+ export const unknownError: ApiResponse = {
+  message_code: 4012,
+  message_text: UNKNOWN_ERROR
 };

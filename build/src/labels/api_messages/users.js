@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UNKNOWN_ERROR = exports.DUPLICATED_VALUE = exports.WRONG_DOCUMENT_ID = exports.INVALID_TOKEN = exports.LOGGIN_FAILED = exports.INVALID_CONFIRMATION_LINK = exports.LANGUAGE_UNSPECIFIED = exports.PASSWORD_SHORT = exports.EMAIL_MALFORMATTED = exports.USER_ALREADY_EXISTS = exports.USER_REGISTERED = void 0;
+exports.USER_REGISTERED = 'Signup successfully done. A confirmation email has been sent to your email';
+exports.USER_ALREADY_EXISTS = 'A user with the same email is already registered';
+exports.EMAIL_MALFORMATTED = 'The email format is invalid';
+exports.PASSWORD_SHORT = 'Password should contain at least 8 characters';
+exports.LANGUAGE_UNSPECIFIED = 'Language should be specified with its own field';
+exports.INVALID_CONFIRMATION_LINK = 'Confirmation link is invalid or already has been confirmed';
+exports.LOGGIN_FAILED = 'Password is incorrect or user doesn\'t exist';
+exports.INVALID_TOKEN = 'Token is invalid or has expired';
+exports.WRONG_DOCUMENT_ID = 'Mongoose document id requested is malformatted and a document couldn\'t be found';
+exports.DUPLICATED_VALUE = 'The document contains duplicated values that should be unique';
+exports.UNKNOWN_ERROR = 'An unknown error has ocurred';

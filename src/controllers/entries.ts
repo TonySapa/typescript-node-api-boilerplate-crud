@@ -111,41 +111,28 @@ router.post('/', (req, res, next) => {
       } else {
         User
           .findOne({ email: (<jwt.UserIDJwtPayload><unknown>decodedToken).email })
-          .exec(async (error, user) => {
+          .exec((error, user) => {
             if (error) {
               return next(error);
             } else {
-              const entry = new EntryModel(req.body);
-              const userId = user && user._id?.toString(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+              const userId = user && user._id?.toString();
+              new EntryModel({ ...req.body, user: userId })
+                .save((error, savedEntry) => {
+                  if (error) {
+                    return next(error);
+                  } else {
+                    return res.status(201).json(savedEntry);
+                  }
+                });
+              /* const entry = new EntryModel(req.body);
+              const userId = user && user._id?.toString();
               entry.user = `${userId}`;
               const savedEntry = await entry.save();
-              return res.status(201).json(savedEntry);
+              return res.status(201).json(savedEntry); */
             }
           });
       }
     });
-
-  /*
-  // 1 - Get token and user data
-  const decodedToken = <jwt.UserIDJwtPayload><unknown>
-    jwt.verify(req.token, `${process.env.SECRET}`, (error: unknown) => res.status(469).json(error));
-  
-  // 2 - Find if user exists and get id
-  const user = await User.findOne({ email: decodedToken.email });
-  console.log(decodedToken.email);
-  const userId = user && user._id?.toString(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-
-  // Reject requests where token or user are invalid
-  if (!req.token || !user) {
-    return res.status(401).json(tokenFailed);
-  // Accept valid requests
-  } else {
-    const entry = new EntryModel(req.body); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-    entry.user = `${userId}`;
-    const savedEntry = await entry.save();
-    return res.status(201).json(savedEntry);
-  }
-  */
 });
 
 export default router;
