@@ -1,8 +1,16 @@
 /* Middleware to factorise error handling and token extraction */
-import { error as logError } from './logger';
+import { error as logError } from '../../utils/logger';
 import { NextFunction, Request, Response } from 'express';
 
-export const errorHandler = (error: Error, _req: Request, res: Response, next: NextFunction) => {
+/******************************************************************************
+ * Middleware to handle errors on routers.
+ * @param {Request} req Express request
+ * @param {Response} res Express response
+ * @param {NextFunction} next Express callback function
+ *****************************************************************************/
+export const errorHandler =
+  (error: Error, _req: Request, res: Response, next: NextFunction) => {
+  
   logError(error.message);
 
   if (error.name === 'CastError' /* && error.kind === 'ObjectId' */) {
@@ -15,23 +23,7 @@ export const errorHandler = (error: Error, _req: Request, res: Response, next: N
     next(error);
     return res.status(401).json({ error: 'invalid token' });
   } else {
-    next(error);
-    return null;
-  }
-};
-
-declare module 'express-serve-static-core' {
-  interface Request {
-    token: string
-  }
-}
-
-export const tokenExtractor = (req: Request, _res: Response, next: NextFunction) => {
-  const auth = req.get('authorization');
-  if (auth && auth.toLowerCase().startsWith('bearer ')) {
-    req.token = auth.substring(7);
-    next();
-  } else {
-    next();
+    // next(error);
+    return res.status(500).json(error);
   }
 };

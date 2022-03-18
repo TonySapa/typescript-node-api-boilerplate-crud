@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user/User';
 import EntryModel from '../models/entry/Entry';
 import { entryType } from '../models/entry/entry.types';
-import { tokenFailed } from '../views/json/users';
+// import { tokenFailed } from '../views/json/users';
 
 const router = express.Router();
 
@@ -101,10 +101,34 @@ router.put('/:id', async (req, res) => {
  * @param {entryType} entry 
  * @returns a 201 with the new entry
  *****************************************************************************/
-router.post('/', async (req, res, next) => {
+router.post('/', (req, res, next) => {
+  return jwt.verify(
+    req.token,
+    `${process.env.SECRET}`,
+    (error, decodedToken) => {
+      if (error) {
+        return next(error);
+      } else {
+        User
+          .findOne({ email: (<jwt.UserIDJwtPayload><unknown>decodedToken).email })
+          .exec(async (error, user) => {
+            if (error) {
+              return next(error);
+            } else {
+              const entry = new EntryModel(req.body);
+              const userId = user && user._id?.toString(); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+              entry.user = `${userId}`;
+              const savedEntry = await entry.save();
+              return res.status(201).json(savedEntry);
+            }
+          });
+      }
+    });
+
+  /*
   // 1 - Get token and user data
   const decodedToken = <jwt.UserIDJwtPayload><unknown>
-    jwt.verify(req.token, `${process.env.SECRET}`, (error) => next(error));
+    jwt.verify(req.token, `${process.env.SECRET}`, (error: unknown) => res.status(469).json(error));
   
   // 2 - Find if user exists and get id
   const user = await User.findOne({ email: decodedToken.email });
@@ -121,6 +145,7 @@ router.post('/', async (req, res, next) => {
     const savedEntry = await entry.save();
     return res.status(201).json(savedEntry);
   }
+  */
 });
 
 export default router;

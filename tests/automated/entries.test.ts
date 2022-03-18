@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import supertest from 'supertest';
-import index from '../../index';
+import index from '../../src/index';
 // import User from '../../models/user/User';
 
 const api = supertest(index);
