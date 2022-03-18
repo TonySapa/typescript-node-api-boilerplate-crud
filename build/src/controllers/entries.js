@@ -16,6 +16,7 @@ const express_1 = __importDefault(require("express"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const User_1 = __importDefault(require("../models/user/User"));
 const Entry_1 = __importDefault(require("../models/entry/Entry"));
+const entries_handlers_1 = require("./entries.handlers");
 // import { tokenFailed } from '../views/json/users';
 const router = express_1.default.Router();
 /******************************************************************************
@@ -100,36 +101,18 @@ router.put('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
  * @returns a 201 with the new entry
  *****************************************************************************/
 router.post('/', (req, res, next) => {
+    // Verify authentication by decoding bearer token.
     return jsonwebtoken_1.default.verify(req.token, `${process.env.SECRET}`, (error, decodedToken) => {
         if (error) {
             return next(error);
         }
         else {
+            // Find and assign the logged in user to the entry and save it.
             User_1.default
                 .findOne({ email: decodedToken.email })
-                .exec((error, user) => {
-                var _a;
-                if (error) {
-                    return next(error);
-                }
-                else {
-                    const userId = user && ((_a = user._id) === null || _a === void 0 ? void 0 : _a.toString());
-                    new Entry_1.default(Object.assign(Object.assign({}, req.body), { user: userId }))
-                        .save((error, savedEntry) => {
-                        if (error) {
-                            return next(error);
-                        }
-                        else {
-                            return res.status(201).json(savedEntry);
-                        }
-                    });
-                    /* const entry = new EntryModel(req.body);
-                    const userId = user && user._id?.toString();
-                    entry.user = `${userId}`;
-                    const savedEntry = await entry.save();
-                    return res.status(201).json(savedEntry); */
-                }
-            });
+                .exec((error, user) => error
+                ? next(error)
+                : (0, entries_handlers_1.saveEntry)(req, res, user, next));
         }
     });
 });

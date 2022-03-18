@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user/User';
 import EntryModel from '../models/entry/Entry';
 import { entryType } from '../models/entry/entry.types';
+import { saveEntry } from './entries.handlers';
 // import { tokenFailed } from '../views/json/users';
 
 const router = express.Router();
@@ -102,6 +103,7 @@ router.put('/:id', async (req, res) => {
  * @returns a 201 with the new entry
  *****************************************************************************/
 router.post('/', (req, res, next) => {
+  // Verify authentication by decoding bearer token.
   return jwt.verify(
     req.token,
     `${process.env.SECRET}`,
@@ -109,28 +111,13 @@ router.post('/', (req, res, next) => {
       if (error) {
         return next(error);
       } else {
+        // Find and assign the logged in user to the entry and save it.
         User
           .findOne({ email: (<jwt.UserIDJwtPayload><unknown>decodedToken).email })
-          .exec((error, user) => {
-            if (error) {
-              return next(error);
-            } else {
-              const userId = user && user._id?.toString();
-              new EntryModel({ ...req.body, user: userId })
-                .save((error, savedEntry) => {
-                  if (error) {
-                    return next(error);
-                  } else {
-                    return res.status(201).json(savedEntry);
-                  }
-                });
-              /* const entry = new EntryModel(req.body);
-              const userId = user && user._id?.toString();
-              entry.user = `${userId}`;
-              const savedEntry = await entry.save();
-              return res.status(201).json(savedEntry); */
-            }
-          });
+          .exec((error, user) => error
+            ? next(error)
+            : saveEntry(req, res, user, next)
+          );
       }
     });
 });
