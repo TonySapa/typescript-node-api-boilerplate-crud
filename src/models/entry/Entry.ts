@@ -1,6 +1,6 @@
-import { model, Schema } from 'mongoose';
-import uniqueValidator from 'mongoose-unique-validator';
-import { entryType } from './entry.types';
+import { model, Schema } from 'mongoose'
+import uniqueValidator from 'mongoose-unique-validator'
+import { entryType } from './entry.types'
 
 const entrySchema = new Schema<entryType>({
   field1: {
@@ -17,18 +17,18 @@ const entrySchema = new Schema<entryType>({
     type: String,
     required: true
   }
-});
+})
 
 /* entrySchema.set('toJSON', {
   transform: (_document, returnedObject) => {
-    // returnedObject.id = `${returnedObject._id}`.toString();
-    // delete returnedObject._id;
-    // delete returnedObject.__v;
-    // delete returnedObject.passwordHash;
+    // returnedObject.id = `${returnedObject._id}`.toString()
+    // delete returnedObject._id
+    // delete returnedObject.__v
+    // delete returnedObject.passwordHash
   }
-}); */
+}) */
 
-entrySchema.plugin(uniqueValidator);
+entrySchema.plugin(uniqueValidator)
 
 /** Mongoose model for "entry". With fields: field1, field2 and user.
  * @field field1 is a unique string between 3 and 254 characters
@@ -36,6 +36,6 @@ entrySchema.plugin(uniqueValidator);
  * @field user is a unique string with the user id
  * @
  */
-const EntryModel = model<entryType>('Entry', entrySchema);
+const EntryModel = model<entryType>('Entry', entrySchema)
 
-export default EntryModel;
+export default EntryModel

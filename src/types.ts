@@ -13,23 +13,25 @@ export enum Visibility {
   Poor = 'poor',
 }
 
-export type NonSensitiveDiaryEntry = Omit<DiaryEntry, 'comment'>;
+export type NonSensitiveDiaryEntry = Omit<DiaryEntry, 'comment'>
 
-export type NewDiaryEntry = Omit<DiaryEntry, 'id'>;
+export type NewDiaryEntry = Omit<DiaryEntry, 'id'>
 
 export interface DiaryEntry {
-  id: number;
-  date: string;
-  weather: Weather;
-  visibility: Visibility;
-  comment: string;
+  id: number
+  date: string
+  weather: Weather
+  visibility: Visibility
+  comment: string
 }
 
 export interface UserToSignup {
-  email: string;
-  passwordHash: string;
-  account_status?: string;
-  account_status_token?: string;
+  account_status?: string
+  account_status_token?: string
+  email: string
+  language?: string
+  password: string
+  passwordHash?: string
 }
 
 export interface ApiResponseCrud {
@@ -40,7 +42,7 @@ export interface ApiResponseCrud {
   crud: ApiResponseCrudResult
 }
 
-export type ApiResponse = Omit<ApiResponseCrud, 'crud'>;
+export type ApiResponse = Omit<ApiResponseCrud, 'crud'>
 
 export interface ApiResponseCrudResult {
   before: unknown,

@@ -1,14 +1,15 @@
-import express from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../models/user/User';
-import EntryModel from '../models/entry/Entry';
-import { entryType } from '../models/entry/entry.types';
-import { saveEntry } from './entries.handlers';
-// import { tokenFailed } from '../views/json/users';
+import express from 'express'
+import jwt from 'jsonwebtoken'
+import User from '../models/user/User'
+import EntryModel from '../models/entry/Entry'
+import { entryType } from '../models/entry/entry.types'
+import { saveEntry } from './entries.handlers'
+// import { tokenFailed } from '../views/json/users'
 
-const router = express.Router();
+const router = express.Router()
 
 declare module 'jsonwebtoken' {
+  // eslint-disable-next-line no-unused-vars
   interface UserIDJwtPayload extends jwt.JwtPayload {
     email: string
   }
@@ -17,9 +18,9 @@ declare module 'jsonwebtoken' {
 /******************************************************************************
  * Health endpoint to monitor that  the route is working
  *****************************************************************************/
- router.get('/ping', (_req, res) => {
-  res.send('Hello World');
-});
+router.get('/ping', (_req, res) => {
+  res.send('Hello World')
+})
 
 /******************************************************************************
  * Gets all entries without any filters
@@ -28,10 +29,10 @@ declare module 'jsonwebtoken' {
  *****************************************************************************/
 router.get('/', async (_req, res) => {
   const entries = await EntryModel
-    .find({}).populate('user', { username: 1, name: 1 });
+    .find({}).populate('user', { username: 1, name: 1 })
 
-  res.json(entries);
-});
+  res.json(entries)
+})
 
 /******************************************************************************
  * Get a specific entry, found by id
@@ -40,11 +41,11 @@ router.get('/', async (_req, res) => {
  * @returns a 200 with the matched entry
  *****************************************************************************/
 router.get('/:id', async (req, res) => {
-  const entry = await EntryModel.findById(req.params.id);
+  const entry = await EntryModel.findById(req.params.id)
   entry
     ? res.status(200).json(entry)
-    : res.status(404).json({ error: 'No blog found with that id' });
-});
+    : res.status(404).json({ error: 'No blog found with that id' })
+})
 
 /******************************************************************************
  * Deletes a specific entry, found by id
@@ -54,28 +55,29 @@ router.get('/:id', async (req, res) => {
  *****************************************************************************/
 router.delete('/:id', async (req, res) => {
   const decodedToken = <jwt.UserIDJwtPayload><unknown>
-    jwt.verify(req.token, `${process.env.SECRET}`);
+    jwt.verify(req.token, `${process.env.SECRET}`)
 
-  const userId = decodedToken.id; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
- 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const userId = decodedToken.id
+
   if (!req.token || !userId) {
-    return res.status(401).json({ error: 'token missing or invalid' });
+    return res.status(401).json({ error: 'token missing or invalid' })
   } else {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId)
     if (!user) {
-      return res.status(401).json({ error: 'User invalid' });
+      return res.status(401).json({ error: 'User invalid' })
     } else {
-      const entry = await EntryModel.findById(req.params.id);
+      const entry = await EntryModel.findById(req.params.id)
       if (entry && (entry.user.toString() !== userId)) {
         return res
-          .status(401).json({ error: 'only the creator can delete it' });
+          .status(401).json({ error: 'only the creator can delete it' })
       } else {
-        entry && await entry.remove();
-        return res.status(204).end();  
+        entry && await entry.remove()
+        return res.status(204).end()
       }
     }
   }
-});
+})
 
 /******************************************************************************
  * Updates a specific entry, found by id
@@ -84,22 +86,23 @@ router.delete('/:id', async (req, res) => {
  * @returns a 200 with the updated entry
  *****************************************************************************/
 router.put('/:id', async (req, res) => {
-  const entry: entryType = req.body; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const entry: entryType = req.body
 
   const updatedEntry = await EntryModel
-    .findByIdAndUpdate(req.params.id, entry, { new: true });
+    .findByIdAndUpdate(req.params.id, entry, { new: true })
 
   if (!updatedEntry) {
-    return res.status(400).send({ error: 'No entry exists with that id' });
+    return res.status(400).send({ error: 'No entry exists with that id' })
   } else {
-    return res.json(updatedEntry.toJSON());
+    return res.json(updatedEntry.toJSON())
   }
-});
+})
 
 /******************************************************************************
  * Creates a new entry.
  * @access a token IS needed
- * @param {entryType} entry 
+ * @param {entryType} entry
  * @returns a 201 with the new entry
  *****************************************************************************/
 router.post('/', (req, res, next) => {
@@ -109,17 +112,19 @@ router.post('/', (req, res, next) => {
     `${process.env.SECRET}`,
     (error, decodedToken) => {
       if (error) {
-        return next(error);
+        return next(error)
       } else {
         // Find and assign the logged in user to the entry and save it.
         User
-          .findOne({ email: (<jwt.UserIDJwtPayload><unknown>decodedToken).email })
+          .findOne({
+            email: (<jwt.UserIDJwtPayload><unknown>decodedToken).email
+          })
           .exec((error, user) => error
             ? next(error)
             : saveEntry(req, res, user, next)
-          );
+          )
       }
-    });
-});
+    })
+})
 
-export default router;
+export default router
