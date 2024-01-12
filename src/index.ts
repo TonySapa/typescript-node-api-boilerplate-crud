@@ -1,11 +1,10 @@
-import mongoose, { ConnectOptions } from 'mongoose'
-import { MONGODB_URI } from './utils/config'
+import mongoose from 'mongoose'
+import { MONGODB_URI, PORT } from './utils/config'
 import { info, error as logError } from './utils/logger'
 import app from './app'
 
 mongoose.connect(
-  `${MONGODB_URI}`,
-  { useNewUrlParser: true, useUnifiedTopology: true } as ConnectOptions
+  `${MONGODB_URI}`
 )
   .then(() => {
     info('connected to MongoDB')
@@ -13,8 +12,6 @@ mongoose.connect(
   .catch((error) => {
     logError('error connection to MongoDB:', `${error.message}`)
   })
-
-const PORT = 3000
 
 app.listen(PORT, () => {
   info(`Server running on port ${PORT}`)

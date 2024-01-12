@@ -1,9 +1,10 @@
-import express from 'express'
+import express, { Request } from 'express'
 import jwt from 'jsonwebtoken'
 import User from '../models/user/User'
 import EntryModel from '../models/entry/Entry'
 import { entryType } from '../models/entry/entry.types'
 import { saveEntry } from './entries.handlers'
+import { CallbackError } from 'mongoose'
 // import { tokenFailed } from '../views/json/users'
 
 const router = express.Router()
@@ -44,7 +45,7 @@ router.get('/:id', async (req, res) => {
   const entry = await EntryModel.findById(req.params.id)
   entry
     ? res.status(200).json(entry)
-    : res.status(404).json({ error: 'No blog found with that id' })
+    : res.status(404).json({ error: 'No entry was found with that id' })
 })
 
 /******************************************************************************
@@ -53,7 +54,7 @@ router.get('/:id', async (req, res) => {
  * @param {string} id the id to match
  * @returns a 204 with no content
  *****************************************************************************/
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req: Request, res) => {
   const decodedToken = <jwt.UserIDJwtPayload><unknown>
     jwt.verify(req.token, `${process.env.SECRET}`)
 
@@ -68,11 +69,13 @@ router.delete('/:id', async (req, res) => {
       return res.status(401).json({ error: 'User invalid' })
     } else {
       const entry = await EntryModel.findById(req.params.id)
-      if (entry && (entry.user.toString() !== userId)) {
+      if (!entry) {
+        return res.status(404).json({ error: 'Entry not found' })
+      } else if (entry && (entry.user.toString() !== userId)) {
         return res
           .status(401).json({ error: 'only the creator can delete it' })
       } else {
-        entry && await entry.remove()
+        entry && await entry.deleteOne()
         return res.status(204).end()
       }
     }
@@ -110,21 +113,22 @@ router.post('/', (req, res, next) => {
   return jwt.verify(
     req.token,
     `${process.env.SECRET}`,
-    (error, decodedToken) => {
+    async (error: CallbackError, decodedToken) => {
       if (error) {
         return next(error)
       } else {
         // Find and assign the logged in user to the entry and save it.
-        User
-          .findOne({
-            email: (<jwt.UserIDJwtPayload><unknown>decodedToken).email
-          })
-          .exec((error, user) => error
-            ? next(error)
-            : saveEntry(req, res, user, next)
-          )
+        const user = await User.findOne({
+          email: (<jwt.UserIDJwtPayload><unknown>decodedToken).email
+        })
+        if (!user) {
+          res.status(404).send('Invalid user.')
+        } else {
+          await saveEntry(req, res, user, next)
+        }
       }
-    })
+    }
+  )
 })
 
 export default router

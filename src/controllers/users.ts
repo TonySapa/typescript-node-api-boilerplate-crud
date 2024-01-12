@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import User from '../models/user/User'
 import { UserToSignup } from '../types'
@@ -10,10 +10,9 @@ import {
   loginFailed
 } from '../views/json/users'
 import { validatePassword } from './users_handlers'
-import { sendEmail } from '../utils/emails/send'
-import { API_URL } from '../utils/config'
 import jwt from 'jsonwebtoken'
 import { USER_LANGUAGES } from '../domain'
+import { CallbackError } from 'mongoose'
 
 const router = express.Router()
 
@@ -29,56 +28,32 @@ router.get('/ping', (_req, res: Response) => {
  * parameters, stores it into mongodb and sends email of confirmation.
  * The response is a 201 informing the user that an email of confirmation has
  * been sent.
- * @param {string} email user email to register.
- * @param {string} password user literal password.
  *****************************************************************************/
-router.post('/signup', async (req: Request<UserToSignup>, res: Response) => {
+router.post('/signup', async (req: Request<UserToSignup>, res: Response, next: NextFunction) => {
   const saltRounds = 10
   const { email, password, language } = req.body as UserToSignup
   const passwordHash = await bcrypt.hash(password, saltRounds)
   const accountStatusToken = await bcrypt.hash(email, saltRounds)
-
   if (!USER_LANGUAGES.includes(language || 'enUS')) {
     return res.status(422).json(languageUnspecified)
-  }
-
-  const user = new User({
-    email,
-    passwordHash,
-    accountStatusToken
-  })
-
-  const template = `signup_confirmation_${language}.hbs`
-  if (!language) {
+  } else if (!language) {
     return res.status(422).json(languageUnspecified)
   } else if (!validatePassword(password)) {
     return res.status(422).json(passwordTooShort)
   } else {
-    // Successfully saved
-    const emailConfig = {
-      template,
-      email_recipient: email,
-      // name_recipient: '',
-      subject: 'Welcome. Please confirm your sign up'
-    }
-
-    const emailVars = {
-      signup_confirmation_url: `${API_URL}/users/signup/${accountStatusToken}`
-    }
-
-    return sendEmail(emailConfig, emailVars)
-      .then(() => user.save()
-        .then((savedUser) => res.status(201).json({
-          ...userRegistered,
-          crud: {
-            before: null,
-            after: savedUser
-          }
-        }))
-        .catch((error: Error) => {
-          throw new Error(`Couldn't store on mongo. ${error}`)
-        }))
-      .catch((error: Error) => res.status(400).send(`${error}`))
+    return await new User({
+      email,
+      passwordHash,
+      accountStatusToken
+    })
+      .save()
+      .catch((error: CallbackError) => {
+        next(error)
+      })
+      .then(
+        (savedUser) => res.status(201).json(savedUser),
+        (error) => next(error)
+      )  
   }
 })
 
@@ -131,13 +106,6 @@ router.post('/login', async (req: Request<UserToSignup>, res: Response) => {
   if (!(user && passwordCorrect)) {
     return res.status(401).send(loginFailed)
   }
-
-  // If account_status !== 'active'. By default we will accept unconfirmed emails
-  // so users can start using the app without any hassle.
-
-  /* if (user.account_status !== typesOfAccountStatus[1]) {
-    return res.status(401).send('Account is not validated')
-  } */
 
   const userForToken = {
     email: user.email,

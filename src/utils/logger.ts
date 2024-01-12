@@ -1,4 +1,4 @@
-// Used to factorise console log
+// Used to re-factorise console log
 
 export const info = (...params: Array<unknown>): void => {
   if (process.env.NODE_ENV !== 'test') { 

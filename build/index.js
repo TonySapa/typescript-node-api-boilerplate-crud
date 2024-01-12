@@ -7,7 +7,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const config_1 = require("./utils/config");
 const logger_1 = require("./utils/logger");
 const app_1 = __importDefault(require("./app"));
-mongoose_1.default.connect(`${config_1.MONGODB_URI}`, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose_1.default.connect(`${config_1.MONGODB_URI}`)
     .then(() => {
     (0, logger_1.info)('connected to MongoDB');
 })

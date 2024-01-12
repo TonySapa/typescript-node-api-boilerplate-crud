@@ -3,7 +3,6 @@ import express from 'express'
 import { info } from './utils/logger'
 import { tokenExtractor } from './middlewares/authentication'
 import userRouter from './controllers/users'
-import emailsRouter from './controllers/emails'
 import entriesRouter from './controllers/entries'
 import { engine } from 'express-handlebars'
 import { errorHandler } from './middlewares/error_handling'
@@ -24,7 +23,6 @@ app.get('/ping', (_req, res) => {
 })
 
 app.use('/api/users', userRouter)
-app.use('/api/emails', emailsRouter)
 app.use('/api/entries', entriesRouter, errorHandler)
 
 export default app

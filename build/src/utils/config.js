@@ -14,4 +14,4 @@ exports.MONGODB_URI = process.env.NODE_ENV === 'test'
         : process.env.PRODUCTION_MONGODB_URI;
 exports.API_URL = process.env.NODE_ENV === 'production'
     ? 'https://www.ticktax.io/api'
-    : 'http:localhost:3000/api';
+    : 'http:localhost:3001/api';
